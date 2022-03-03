@@ -34,16 +34,5 @@ while True:
        if scd.data_available:
             uart.write("{},{},{}".format(round(float(scd.CO2),1), round(float(scd.temperature),1), round(float(scd.relative_humidity),1)))
             time.sleep(1)
-            
-        
-while True:
-    # since the measurement interval is long (2+ seconds) we check for new data before reading
-    # the values, to ensure current readings.
-    if scd.data_available:
-        print("CO2: %d PPM" % scd.CO2)
-        print("Temperature: %0.2f degrees C" % scd.temperature)
-        print("Humidity: %0.2f %% rH" % scd.relative_humidity)
-        print("------")
 
-        time.sleep(1)
    
