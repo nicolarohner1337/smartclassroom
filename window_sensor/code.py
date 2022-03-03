@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
+# SPDX-License-Identifier: MIT
+
 import time
 import board
 import adafruit_hcsr04
@@ -15,9 +18,17 @@ uart_connection = None
 ble = BLERadio()
 uart = UARTService()
 advertisement = ProvideServicesAdvertisement(uart)
+num = "0"
+
+while not initDistance:
+    try:
+        initDistance = sonar.distance
+    except:
+        pass
+print(initDistance)
+
 while True:
     led[0] = (255, 0, 0)
-
     ble.start_advertising(advertisement)
     print("Waiting to connect")
     while not ble.connected:
@@ -25,20 +36,18 @@ while True:
     print("Connected")
     led[0] = (0, 255, 0)
     while ble.connected:
-        while not initDistance:
-            try:
-                initDistance = sonar.distance
-            except:
-                pass
-        print(initDistance)
-        while True:
-            try:
-                if sonar.distance > initDistance + 5:
-                    uart.write("1")
-                    led[0] = (0, 0, 255)
-                else:
-                    uart.write("0")
-                    led[0] = (255, 0, 0)
-            except RuntimeError:
-                pass
-            time.sleep(0.05)
+        try:
+
+            if sonar.distance > initDistance + 5:
+                num = "1"
+
+                # led[0]= (0,0,255)
+            else:
+                num = "0"
+
+                # led[0]= (255,0,0)
+            uart.write(num)
+        except RuntimeError:
+            uart.write(num)
+            pass
+        time.sleep(0.5)
