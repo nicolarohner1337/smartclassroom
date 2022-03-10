@@ -54,9 +54,11 @@ while True:
                     num = "0"
                 led[0]= (0,255,0)
             uart.write(sensor_id + "," + num + "\n")
+            time.sleep(1)
             print(sensor_id, num, sonar.get_distance())
         except RuntimeError:
             uart.write(sensor_id + ","+ num + "\n")
+            time.sleep(1)
             print(sensor_id, num)
             pass
         time.sleep(0.5)
