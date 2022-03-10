@@ -9,7 +9,8 @@ from adafruit_ble import BLERadio
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.nordic import UARTService
 
-sonar = adafruit_hcsr04.HCSR04(trigger_pin=board.SDA, echo_pin=board.SCL)
+# nRF5840 D5, Grove D2
+sonar = adafruit_hcsr04.GroveUltrasonicRanger(board.SCL)
 led = neopixel.NeoPixel(board.NEOPIXEL, 1)
 led.brightness = 0.3
 initDistance = None
@@ -19,10 +20,11 @@ ble = BLERadio()
 uart = UARTService()
 advertisement = ProvideServicesAdvertisement(uart)
 num = "0"
+sensor_id = "1"
 
 while not initDistance:
     try:
-        initDistance = sonar.distance
+        initDistance = sonar.get_distance()
     except:
         pass
 print(initDistance)
@@ -38,16 +40,25 @@ while True:
     while ble.connected:
         try:
 
-            if sonar.distance > initDistance + 5:
-                num = "1"
+            if sonar.get_distance() > initDistance + 5:
+                if num == "0":
+                    led[0]=(0,0,255)
+                    time.sleep(0.5)
+                    num = "1"
 
-                # led[0]= (0,0,255)
+                led[0]=(0,255,0)
             else:
-                num = "0"
-
-                # led[0]= (255,0,0)
-            uart.write(num)
+                if num == "1":
+                    led[0]= (255,255,0)
+                    time.sleep(0.5)
+                    num = "0"
+                led[0]= (0,255,0)
+            uart.write(sensor_id + "," + num + "\n")
+            print(sensor_id, num, sonar.get_distance())
         except RuntimeError:
-            uart.write(num)
+            uart.write(sensor_id + ","+ num + "\n")
+            print(sensor_id, num)
             pass
         time.sleep(0.5)
+
+
