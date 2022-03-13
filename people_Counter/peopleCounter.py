@@ -25,7 +25,7 @@ def main():
     initDist.append(int(sonar1.get_distance()))
 
     initDist.append(int(sonar2.get_distance()))
-
+    noise = 20
     seq = ''
     lastSeq = ''
     skip = False
@@ -47,16 +47,16 @@ def main():
     bucket = "smartclassroom" """
     while True:
         
-        if int(sonar1.get_distance()) < initDist[0] - 30 and int(sonar2.get_distance()) < initDist[1] - 30:
+        if int(sonar1.get_distance()) < initDist[0] - noise and int(sonar2.get_distance()) < initDist[1] - 30:
             if '0' not in seq:
                 seq+= '0'
             skip = True
         
-        if int(sonar1.get_distance()) < initDist[0] - 30 and '1' not in seq and not skip:
+        if int(sonar1.get_distance()) < initDist[0] - noise and '1' not in seq and not skip:
             seq+= '1'
             skip =True
 
-        if int(sonar2.get_distance()) < initDist[1] - 30 and '2' not in seq and not skip:
+        if int(sonar2.get_distance()) < initDist[1] - noise and '2' not in seq and not skip:
             seq+= '2'
         #TODO: handle situation where both sensors are triggered
         if len(seq) > 1 and len(seq) < 4:
@@ -87,7 +87,7 @@ def main():
         if len(seq) > 0:
             timeOut+=1
 
-        if timeOut > 150 and len(seq) > 0:
+        if timeOut > 100 and len(seq) > 0:
             print("Timeout")
             seq = ''
             timeOut = 0
