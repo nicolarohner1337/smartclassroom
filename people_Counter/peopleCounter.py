@@ -16,7 +16,7 @@ def main():
         count += 1
     """
 
-    display = Grove4DigitDisplay(12, 13, brightness=7)
+    #display = Grove4DigitDisplay(12, 13, brightness=7)
     sonar1 = GroveUltrasonicRanger(16)
     sonar2 = GroveUltrasonicRanger(5)
     
@@ -34,13 +34,13 @@ def main():
     print("initital distance:",initDist)
 
     #Show initial distance
-    display.show(initDist[0])
+    #display.show(initDist[0])
     time.sleep(1)
-    display.show('----')
+    #display.show('----')
     time.sleep(1)
-    display.show(initDist[1])
+    #display.show(initDist[1])
     time.sleep(1)
-    display.show(counter)
+    #display.show(counter)
 
     """ token = "JqkM8xndU1lIiRkO76gt-YZLf1FWVu-1knan1Zaek8E-Hr1E59x7wPk9UuzOLCHJVv99OpZvfYjunvP9Fn6kgw=="
     org = "nicola.rohner@students.fhnw.ch"
@@ -64,7 +64,7 @@ def main():
                 counter+=1
                 print(counter,"Personen")
                 seq = ''
-                display.show(counter)
+                #display.show(counter)
                 """ with InfluxDBClient(url="https://eu-central-1-1.aws.cloud2.influxdata.com", token=token, org=org,ssl_CA_cert=certifi.where()) as client:
                     write_api = client.write_api(write_options=SYNCHRONOUS)
                     data = "personCounter,sensor=ultrasonice persons={}".format(counter)
@@ -74,7 +74,7 @@ def main():
                 counter-=1
                 print(counter,"Personen")
                 seq = ''
-                display.show(counter)
+                #display.show(counter)
                 """ with InfluxDBClient(url="https://eu-central-1-1.aws.cloud2.influxdata.com", token=token, org=org,ssl_CA_cert=certifi.where()) as client:
                     write_api = client.write_api(write_options=SYNCHRONOUS)
                     data = "personCounter,sensor=ultrasonice persons={}".format(counter)
