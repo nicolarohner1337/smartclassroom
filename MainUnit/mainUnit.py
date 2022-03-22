@@ -2,6 +2,7 @@
 from socket import timeout
 import time
 import requests
+from colorama import Fore
 from adafruit_ble import BLERadio
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.nordic import UARTService
@@ -9,27 +10,28 @@ from adafruit_ble.services.nordic import UARTService
 
 ble = BLERadio()
 
+class noConnection:
+    connected = False
 
 
 uart_connections = {
-    'CIRCUITPY323d': {'connection':None,'values':3,'units':['PPM','C','%'],'timeoutDuration':0,'notTimeout':True,'timeoutStart':time.time(),'lastValues':[]},
-    'CIRCUITPY825a': {'connection':None,'values':1, 'units':['Window'],'timeoutDuration':0,'notTimeout':True,'timeoutStart':time.time(),'lastValues':[]},
-    'CIRCUITPYbec9': {'connection':None,'values':1, 'units':['Window'],'timeoutDuration':0,'notTimeout':True,'timeoutStart':time.time(),'lastValues':[]}
+    'CIRCUITPY323d': {'connection':noConnection,'values':3,'units':['PPM','C','%'],'timeoutDuration':0,'notTimeout':True,'timeoutStart':time.time(),'lastValues':[]},
+    'CIRCUITPY825a': {'connection':noConnection,'values':1, 'units':['Window'],'timeoutDuration':0,'notTimeout':True,'timeoutStart':time.time(),'lastValues':[]},
+    'CIRCUITPYbec9': {'connection':noConnection,'values':1, 'units':['Window'],'timeoutDuration':0,'notTimeout':True,'timeoutStart':time.time(),'lastValues':[]}
     #'CIRCUITPY7c40': {'connection':None}
 }
 urlApi = 'https://glusfqycvwrucp9-db202202211424.adb.eu-zurich-1.oraclecloudapps.com/ords/sensor_datalake1/sens/insert/'
 headers = {"key":"Content-Type","value":"application/json","description":""}
 lastApiCall = time.time()
-class noConnection:
-    connected = False
+
 notTimeout = True
 setTimeout = time.time()
 #delete because move this to the connections dictionary
 #timeoutDuration = 60
-timeoutDurationSteps = [30,60,120,240,480,600,1200,1800]
+timeoutDurationSteps = [60,120,240,480,600,1200,1800]
 def connection(uart_connection,complete_name):
     while not uart_connection:
-        print("Trying to connect...{}".format(complete_name))
+        print(Fore.YELLOW + "Trying to connect...{}".format(complete_name))
         for adv in ble.start_scan(ProvideServicesAdvertisement,timeout=10.0):
             #if longer than 10 seconds, stop trying
             if UARTService in adv.services:
@@ -37,10 +39,10 @@ def connection(uart_connection,complete_name):
                     #try to connect with specific device
                     if complete_name == adv.complete_name:
                         uart_connection = ble.connect(adv, timeout=10.0)
-                        print("Connected")
+                        print(Fore.GREEN + "Connected to {}".format(complete_name))
                         break
                 except:
-                    print("Connection timed out")
+                    print(Fore.RED + "Connection timed out")
                     break
         ble.stop_scan()
         break
@@ -52,11 +54,11 @@ def connection(uart_connection,complete_name):
         #is this really needed?
         #uart_connections[complete_name]['inRange'] = False
         NoUart_connections = noConnection
-        print("Failed to connect with {}".format(complete_name))
+        print(Fore.RED + "Failed to connect with {}".format(complete_name))
         return None, NoUart_connections
 #check if connection is true
-for k,v in uart_connections.items():
-    uart_connections[k]['service'],uart_connections[k]['connection'] = connection(v['connection'],k)
+#for k,v in uart_connections.items():
+    #uart_connections[k]['service'],uart_connections[k]['connection'] = connection(v['connection'],k)
 
 
 while True:
@@ -78,23 +80,26 @@ while True:
                     #only read if there is connection
                     #TODO read more sleep less, konstante daten, mehr kontrolle über die gelesenen daten
                     if uart_connections[k]['connection'].connected:
+                        #if lastValues is empty, read all
                         tempList = uart_connections[k]['service'].readline()
                         tempList = tempList.decode('utf-8').strip('\n').split(',')
-                        if uart_connections[k]['values'] == len(tempList):
-                            print(tempList)
-                            print("prepering to send")
-                            # for list  with lenght > 2 call multiple post requests
+                        if len(uart_connections[k]['lastValues']) == 0:
+                            uart_connections[k]['lastValues'] = tempList
                             
-                            for i in range(len(tempList)):
-                                json = {'sensor_id':k,'value1':tempList[i],'unit1':uart_connections[k]['units'][i-1]}
-                                print(json)
-                                #send request
-                                response = requests.post(urlApi,headers = headers,data=json)
-                                #print response
-                                print(response.status_code)
-                                time.sleep(0.5)
-
-                            lastApiCall = time.time()
+                        if uart_connections[k]['values'] == len(tempList):
+                            # for list  with lenght > 2 call multiple post requests
+                            #if lastValues  equal to tempList, do not send
+                            if uart_connections[k]['lastValues'] != tempList:
+                                uart_connections[k]['lastValues'] = tempList
+                                for i in range(len(tempList)):
+                                    json = {'sensor_id':k,'value1':tempList[i],'unit1':uart_connections[k]['units'][i-1]}
+                                    #send request
+                                    response = requests.post(urlApi,headers = headers,data=json)
+                                    
+                                    #print response
+                                    print(Fore.GREEN + "Sended {} Code:{}".format(json,response.status_code))
+                                    lastApiCall = time.time()
+                                    time.sleep(0.5)
                             #json['timestamp'] = time.time()
                             #send to server
                             
@@ -106,15 +111,15 @@ while True:
         #check for any timeouts that exceed the set timeoutDuration
         for k,v in uart_connections.items():
             if time.time() - uart_connections[k]['timeoutStart'] > uart_connections[k]['timeoutDuration']:
-                uart_connections[k]['notTimeout'] = True
+                uart_connections[k]['tryReconnect'] = True
     
-        while any([uart_connections[k]['notTimeout'] for k,v in uart_connections.items()]) and not all([uart_connections[k]['connection'].connected for k,v in uart_connections.items()]):
+        while any([uart_connections[k]['tryReconnect'] for k,v in uart_connections.items()]) and not all([uart_connections[k]['connection'].connected for k,v in uart_connections.items()]):
             #BUG infinity loop in case of no connection
             for k,v in uart_connections.items():
-                if not uart_connections[k]['connection'].connected:
-                    print("We found a disconnected device {}".format(k))
+                if not uart_connections[k]['connection'].connected and uart_connections[k]['tryReconnect']:
+                    print(Fore.RED + "We found a disconnected device {}".format(k))
                     uart_connections[k]['service'],uart_connections[k]['connection'] = connection(None,k)
-                    uart_connections[k]['notTimeout'] = False
+                    uart_connections[k]['tryReconnect'] = False
                     uart_connections[k]['timeoutStart'] = time.time()
                     #set next timeoutDuration
                     if uart_connections[k]['timeoutDuration'] == 0:
@@ -128,6 +133,7 @@ while True:
                     #Reset the timeoutDuration for reconnected Devices
                     if uart_connections[k]['connection'].connected:
                         uart_connections[k]['timeoutDuration'] = 0
+                    print(Fore.YELLOW + "Try to reconnect again in {} seconds for Device: {}".format(uart_connections[k]['timeoutDuration'],k))
                 else:
                     #for connected devices set not Timeout to false to exit the while loop
-                    uart_connections[k]['notTimeout'] = False
+                    uart_connections[k]['tryReconnect'] = False
