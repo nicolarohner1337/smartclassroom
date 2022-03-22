@@ -27,8 +27,9 @@ lastApiCall = time.time()
 notTimeout = True
 setTimeout = time.time()
 #delete because move this to the connections dictionary
-#timeoutDuration = 60
-timeoutDurationSteps = [60,120,240,480,600,1200,1800]
+#timeoutDurationSteps = [60,120,240,480,600,1200,1800]
+#debugSteps
+timeoutDurationSteps = [100000]
 def connection(uart_connection,complete_name):
     while not uart_connection:
         print(Fore.YELLOW + "Trying to connect...{}".format(complete_name))
@@ -83,14 +84,16 @@ while True:
                         #if lastValues is empty, read all
                         tempList = uart_connections[k]['service'].readline()
                         tempList = tempList.decode('utf-8').strip('\n').split(',')
-                        if len(uart_connections[k]['lastValues']) == 0:
-                            uart_connections[k]['lastValues'] = tempList
+                        #if len(uart_connections[k]['lastValues']) == 0:
+                            #uart_connections[k]['lastValues'] = tempList
                             
                         if uart_connections[k]['values'] == len(tempList):
                             # for list  with lenght > 2 call multiple post requests
                             #if lastValues  equal to tempList, do not send
-                            if uart_connections[k]['lastValues'] != tempList:
-                                uart_connections[k]['lastValues'] = tempList
+
+                            #if any([uart_connections[k]['lastValues'][i] != tempList[i] for i in range(len(tempList))]):
+                                #uart_connections[k]['lastValues'] = tempList
+                                
                                 for i in range(len(tempList)):
                                     json = {'sensor_id':k,'value1':tempList[i],'unit1':uart_connections[k]['units'][i-1]}
                                     #send request
