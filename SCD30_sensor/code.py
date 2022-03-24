@@ -1,34 +1,27 @@
-# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
-# SPDX-License-Identifier: MIT
-
+# SPDX-FileCopyrightText: 2020 by Bryan Siepert, written for Adafruit Industries
+#
+# SPDX-License-Identifier: Unlicense
 import time
 import board
-import adafruit_hcsr04
-import neopixel
+import busio
+import adafruit_scd30
+
 from adafruit_ble import BLERadio
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.nordic import UARTService
+import neopixel
 
-# nRF5840 D5, Grove D2
-sonar = adafruit_hcsr04.GroveUltrasonicRanger(board.SCL)
-led = neopixel.NeoPixel(board.NEOPIXEL, 1)
-led.brightness = 0.3
-initDistance = None
+i2c = busio.I2C(board.SCL, board.SDA, frequency=50000)
+scd = adafruit_scd30.SCD30(i2c)
 
 uart_connection = None
 ble = BLERadio()
 uart = UARTService()
 advertisement = ProvideServicesAdvertisement(uart)
-num = "0"
-sensor_id = "CIRCUITPYbec9"
 
-while not initDistance:
-    try:
-        initDistance = sonar.get_distance()
-    except:
-        pass
-print(initDistance)
-
+led = neopixel.NeoPixel(board.NEOPIXEL, 1)
+led.brightness = 0.1
+id = "CIRCUITPY323d"
 while True:
     led[0] = (255, 0, 0)
     ble.start_advertising(advertisement)
@@ -38,32 +31,18 @@ while True:
     print("Connected")
     led[0] = (0, 255, 0)
     while ble.connected:
-        try:
-
-            if sonar.get_distance() > initDistance + 5:
-                if num == "0":
-                    num = "1"
-                    led[0] = (0, 0, 255)
-                    change_time_open = time.monotonic()
-                    while (time.monotonic() - change_time_open) < 30:
-                        uart.write(num + "\n")
-                        time.sleep(0.5)
-
-                led[0] = (0, 255, 0)
-            else:
-                if num == "1":
-                    num = "0"
-                    led[0] = (255, 255, 0)
-                    change_time_closed = time.monotonic()
-                    while (time.monotonic() - change_time_closed) < 30:
-                        uart.write(num + "\n")
-                        time.sleep(0.5)
-
-                led[0] = (0, 255, 0)
-            time.sleep(1)
-
-        except RuntimeError:
-            pass
-        time.sleep(0.5)
-
-
+        if scd.data_available:
+            start_timer = time.monotonic()
+            co2 = []
+            temperature = []
+            humidity = []
+            while (time.monotonic()-start_timer) < 60:
+                co2.append(float(scd.CO2))
+                temperature.append(float(scd.temperature))
+                humidity.append(float(scd.relative_humidity))
+                time.sleep(10)
+            co2 = sum(co2)/len(co2)
+            temperature = sum(temperature)/len(temperature)
+            humidity = sum(humidity)/(len(humidity))
+            uart.write("{},{},{}\n".format(round(float(co2), 1), round(float(temperature), 1), round(float(humidity), 1)))
+            print(temperature, co2, humidity)
