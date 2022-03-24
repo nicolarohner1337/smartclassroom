@@ -8,25 +8,34 @@ import neopixel
 from adafruit_ble import BLERadio
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.nordic import UARTService
+from adafruit_ble.advertising import Advertisement
 
-# nRF5840 D5, Grove D2
+
+ # nRF5840 D5, Grove D2
 sonar = adafruit_hcsr04.GroveUltrasonicRanger(board.SCL)
 led = neopixel.NeoPixel(board.NEOPIXEL, 1)
 led.brightness = 0.3
 initDistance = None
+
 
 uart_connection = None
 ble = BLERadio()
 uart = UARTService()
 advertisement = ProvideServicesAdvertisement(uart)
 num = "0"
-sensor_id = "1"
-
+sensor_id = "CIRCUITPY825a"
+initDistance = []
 while not initDistance:
     try:
-        initDistance = sonar.get_distance()
+        while len(initDistance) < 5:
+            initDistance.append(sonar.get_distance())
+            print(initDistance)
+            time.sleep(0.1)
     except:
         pass
+
+initDistance = sum(initDistance)/len(initDistance)
+
 print(initDistance)
 
 while True:
@@ -39,12 +48,17 @@ while True:
     led[0] = (0, 255, 0)
     while ble.connected:
         try:
-
-            if sonar.get_distance() > initDistance + 5:
+            temp = []
+            while len(temp) < 3:
+                temp.append(sonar.get_distance())
+            temp = sum(temp)/len(temp)
+            if temp > initDistance + 5:
                 if num == "0":
                     led[0]=(0,0,255)
                     time.sleep(0.5)
                     num = "1"
+                    uart.write(num + "\n")
+                    print(num, temp)
 
                 led[0]=(0,255,0)
             else:
@@ -52,15 +66,18 @@ while True:
                     led[0]= (255,255,0)
                     time.sleep(0.5)
                     num = "0"
+                    uart.write(num + "\n")
+                    print(num, temp)
+
                 led[0]= (0,255,0)
-            uart.write(sensor_id + "," + num + "\n")
-            time.sleep(1)
-            print(sensor_id, num, sonar.get_distance())
-        except RuntimeError:
-            uart.write(sensor_id + ","+ num + "\n")
-            time.sleep(1)
+
+            time.sleep(1.0)
+
+        except:
+            uart.write(num + "\n")
+            time.sleep(1.0)
             print(sensor_id, num)
             pass
-        time.sleep(0.5)
+        time.sleep(4.0)
 
 

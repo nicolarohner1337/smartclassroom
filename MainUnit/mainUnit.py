@@ -27,9 +27,9 @@ lastApiCall = time.time()
 notTimeout = True
 setTimeout = time.time()
 #delete because move this to the connections dictionary
-#timeoutDurationSteps = [60,120,240,480,600,1200,1800]
+timeoutDurationSteps = [60,120,240,480,600,1200,1800]
 #debugSteps
-timeoutDurationSteps = [100000]
+#timeoutDurationSteps = [100000]
 def connection(uart_connection,complete_name):
     while not uart_connection:
         print(Fore.YELLOW + "Trying to connect...{}".format(complete_name))
