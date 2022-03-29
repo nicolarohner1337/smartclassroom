@@ -79,7 +79,7 @@ while True:
                     #break
                 try:
                     #only read if there is connection
-                    #TODO read more sleep less, konstante daten, mehr kontrolle über die gelesenen daten
+                    #TODO zahlen mehr lesenn und wenn sie nicht lehr ist an api schicken
                     if uart_connections[k]['connection'].connected:
                         #if lastValues is empty, read all
                         tempList = uart_connections[k]['service'].readline()
