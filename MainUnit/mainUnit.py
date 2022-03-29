@@ -79,7 +79,7 @@ while True:
                     #break
                 try:
                     #only read if there is connection
-                    #TODO read more sleep less, konstante daten, mehr kontrolle über die gelesenen daten
+                    #TODO zahlen mehr lesenn und wenn sie nicht lehr ist an api schicken
                     if uart_connections[k]['connection'].connected:
                         #if lastValues is empty, read all
                         tempList = uart_connections[k]['service'].readline()
@@ -95,14 +95,15 @@ while True:
                                 #uart_connections[k]['lastValues'] = tempList
                                 
                                 for i in range(len(tempList)):
-                                    json = {'sensor_id':k,'value1':tempList[i],'unit1':uart_connections[k]['units'][i-1]}
-                                    #send request
-                                    response = requests.post(urlApi,headers = headers,data=json)
+                                    if str(tempList[i]) != "":
+                                        json = {'sensor_id':k,'value1':tempList[i],'unit1':uart_connections[k]['units'][i]}
+                                        #send request
+                                        response = requests.post(urlApi,headers = headers,data=json)
                                     
-                                    #print response
-                                    print(Fore.GREEN + "Sended {} Code:{}".format(json,response.status_code))
-                                    lastApiCall = time.time()
-                                    time.sleep(0.5)
+                                        #print response
+                                        print(Fore.GREEN + "Sended {} Code:{}".format(json,response.status_code))
+                                        lastApiCall = time.time()
+                                        time.sleep(0.5)
                             #json['timestamp'] = time.time()
                             #send to server
                             
