@@ -3,40 +3,26 @@
 
 import time
 import board
-import adafruit_hcsr04
+import digitalio
 import neopixel
 from adafruit_ble import BLERadio
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.nordic import UARTService
-from adafruit_ble.advertising import Advertisement
 
-
- # nRF5840 D5, Grove D2
-sonar = adafruit_hcsr04.GroveUltrasonicRanger(board.SCL)
+# nRF5840 D5, Grove D2
+infrared = digitalio.DigitalInOut(board.D9)
+infrared.direction = digitalio.Direction.INPUT
 led = neopixel.NeoPixel(board.NEOPIXEL, 1)
 led.brightness = 0.3
 initDistance = None
-
 
 uart_connection = None
 ble = BLERadio()
 uart = UARTService()
 advertisement = ProvideServicesAdvertisement(uart)
-num = "0"
-sensor_id = "CIRCUITPY825a"
-initDistance = []
-while not initDistance:
-    try:
-        while len(initDistance) < 5:
-            initDistance.append(sonar.get_distance())
-            print(initDistance)
-            time.sleep(0.1)
-    except:
-        pass
+sensor_id = "CIRCUITPY7c40"
 
-initDistance = sum(initDistance)/len(initDistance)
-
-print(initDistance)
+last_state = 0 if infrared.value else 1
 
 while True:
     led[0] = (255, 0, 0)
@@ -46,38 +32,19 @@ while True:
         pass
     print("Connected")
     led[0] = (0, 255, 0)
+    time.sleep(2)
     while ble.connected:
-        try:
-            temp = []
-            while len(temp) < 3:
-                temp.append(sonar.get_distance())
-            temp = sum(temp)/len(temp)
-            if temp > initDistance + 5:
-                if num == "0":
-                    led[0]=(0,0,255)
-                    time.sleep(0.5)
-                    num = "1"
-                    uart.write(num + "\n")
-                    print(num, temp)
-
-                led[0]=(0,255,0)
-            else:
-                if num == "1":
-                    led[0]= (255,255,0)
-                    time.sleep(0.5)
-                    num = "0"
-                    uart.write(num + "\n")
-                    print(num, temp)
-
-                led[0]= (0,255,0)
-
-            time.sleep(1.0)
-
-        except:
-            uart.write(num + "\n")
-            time.sleep(1.0)
-            print(sensor_id, num)
-            pass
-        time.sleep(4.0)
-
+        measurement = {1: 0, 0: 0}
+        print(measurement[1])
+        start_check = time.monotonic()
+        while (time.monotonic() - start_check) < 2:
+            measurement[int(infrared.value)] += 1
+            time.sleep(0.1)
+        current_state = max(measurement, key=measurement.get)
+        if current_state != last_state:
+            uart.write(str(current_state))
+            last_state = current_state
+            led[0] = (0,0,255)
+            time.sleep(1)
+            led[0] = (0,255,0)
 
