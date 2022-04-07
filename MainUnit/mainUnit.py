@@ -6,8 +6,8 @@ from colorama import Fore
 from adafruit_ble import BLERadio
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.nordic import UARTService
-from influxdb_client import InfluxDBClient, Point, WritePrecision
-from influxdb_client.client.write_api import SYNCHRONOUS
+#from influxdb_client import InfluxDBClient, Point, WritePrecision
+#from influxdb_client.client.write_api import SYNCHRONOUS
 
 ble = BLERadio()
 
@@ -106,10 +106,10 @@ while True:
                                     
                                         #print response
                                         #print(Fore.GREEN + "Sended {} Code:{}".format(json,response.status_code))
-                                        with InfluxDBClient(url="https://eu-central-1-1.aws.cloud2.influxdata.com", token=token, org=org) as client:
-                                            write_api = client.write_api(write_options=SYNCHRONOUS)
-                                            data = "APICALLS,unit={} increment=1".format(json["unit1"])
-                                            write_api.write(bucket, org, data) 
+                                        #with InfluxDBClient(url="https://eu-central-1-1.aws.cloud2.influxdata.com", token=token, org=org) as client:
+                                            #write_api = client.write_api(write_options=SYNCHRONOUS)
+                                            #data = "APICALLS,unit={} increment=1".format(json["unit1"])
+                                            #write_api.write(bucket, org, data) 
                                         lastApiCall = time.time()
                                         time.sleep(0.5)
                             #json['timestamp'] = time.time()
