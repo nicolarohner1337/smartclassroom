@@ -42,7 +42,7 @@ while True:
             time.sleep(0.1)
         current_state = max(measurement, key=measurement.get)
         if current_state != last_state:
-            uart.write(str(current_state))
+            uart.write(str(current_state)+ "\n")
             last_state = current_state
             led[0] = (0,0,255)
             time.sleep(1)
