@@ -6,7 +6,8 @@ from colorama import Fore
 from adafruit_ble import BLERadio
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.nordic import UARTService
-
+#from influxdb_client import InfluxDBClient, Point, WritePrecision
+#from influxdb_client.client.write_api import SYNCHRONOUS
 
 ble = BLERadio()
 
@@ -16,13 +17,16 @@ class noConnection:
 
 uart_connections = {
     'CIRCUITPY323d': {'connection':noConnection,'values':3,'units':['PPM','C','%'],'timeoutDuration':0,'notTimeout':True,'timeoutStart':time.time(),'lastValues':[]},
-    'CIRCUITPY825a': {'connection':noConnection,'values':1, 'units':['Window'],'timeoutDuration':0,'notTimeout':True,'timeoutStart':time.time(),'lastValues':[]},
-    'CIRCUITPYbec9': {'connection':noConnection,'values':1, 'units':['Window'],'timeoutDuration':0,'notTimeout':True,'timeoutStart':time.time(),'lastValues':[]}
-    #'CIRCUITPY7c40': {'connection':None}
+    'CIRCUITPY825a': {'connection':noConnection,'values':1, 'units':['Window'],'timeoutDuration':0,'notTimeout':True,'timeoutStart':time.time(),'lastValues':[]}
+    #'CIRCUITPYbec9': {'connection':noConnection,'values':1, 'units':['Person'],'timeoutDuration':0,'notTimeout':True,'timeoutStart':time.time(),'lastValues':[]}
 }
 urlApi = 'https://glusfqycvwrucp9-db202202211424.adb.eu-zurich-1.oraclecloudapps.com/ords/sensor_datalake1/sens/insert/'
 headers = {"key":"Content-Type","value":"application/json","description":""}
 lastApiCall = time.time()
+
+token = "JqkM8xndU1lIiRkO76gt-YZLf1FWVu-1knan1Zaek8E-Hr1E59x7wPk9UuzOLCHJVv99OpZvfYjunvP9Fn6kgw=="
+org = "nicola.rohner@students.fhnw.ch"
+bucket = "smartclassroom"
 
 notTimeout = True
 setTimeout = time.time()
@@ -73,7 +77,7 @@ while True:
    
     while any([uart_connections[k]['connection'].connected for k,v in uart_connections.items()]):
         #TODO try read not readline
-        if time.time() - lastApiCall > 20:
+        if time.time() - lastApiCall > 5:
             for k,v in uart_connections.items():
                 #if not all([uart_connections[k]['connection'].connected for k,v in uart_connections.items()]) and time.time() - startSending > 60:
                     #break
@@ -101,7 +105,11 @@ while True:
                                         response = requests.post(urlApi,headers = headers,data=json)
                                     
                                         #print response
-                                        print(Fore.GREEN + "Sended {} Code:{}".format(json,response.status_code))
+                                        #print(Fore.GREEN + "Sended {} Code:{}".format(json,response.status_code))
+                                        #with InfluxDBClient(url="https://eu-central-1-1.aws.cloud2.influxdata.com", token=token, org=org) as client:
+                                            #write_api = client.write_api(write_options=SYNCHRONOUS)
+                                            #data = "APICALLS,unit={} increment=1".format(json["unit1"])
+                                            #write_api.write(bucket, org, data) 
                                         lastApiCall = time.time()
                                         time.sleep(0.5)
                             #json['timestamp'] = time.time()
