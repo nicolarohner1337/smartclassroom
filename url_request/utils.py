@@ -1,5 +1,7 @@
 import requests
 import pandas as pd
+import seaborn as sns
+import matplotlib as plt
 
 def get_all_pages(url, liste=[]):
     '''return database items'''
@@ -22,3 +24,9 @@ def to_data_frame(url_result):
         for dicti in lists:
             output = output.append(dicti, ignore_index=True)
     return output
+
+def overview(df, col):
+    f, axs = plt.subplots(1,2, figsize=(9,6), gridspec_kw=dict(width_ratios=[15,10]))
+    sns.boxplot(df[col], ax=axs[0])
+    sns.distplot(df[col], ax=axs[1])
+    return plt.show()
