@@ -1,7 +1,7 @@
 import requests
 import pandas as pd
 import seaborn as sns
-import matplotlib as plt
+import matplotlib.pyplot as plt
 
 def get_all_pages(url, liste=[]):
     '''return database items'''
