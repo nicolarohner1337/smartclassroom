@@ -12,5 +12,8 @@ sequenceDiagram
     adafruit_window->>raspberry_pi: connection established
     raspberry_pi->>adafruit_people: connect
     adafruit_people->>raspberry_pi: connection established
+    adafruit_ppm_c_%->>raspberry_pi: sends data via bluetooth
+    adafruit_window->>raspberry_pi: sends data via bluetooth
+    adafruit_pepole->>raspberry_pi: sends data via bluetooth
     raspberry_pi->>data_base: sends data via http
 ```
