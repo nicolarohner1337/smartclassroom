@@ -1,7 +1,7 @@
 
 ```mermaid
 sequenceDiagram
-    participant adafruit
+    participant adafruit_ppm_c_%
     participant raspberry_pi
     participant data_base
     adafruit->>raspberry_pi: sends data via bluetooth
