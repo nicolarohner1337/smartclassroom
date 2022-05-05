@@ -3,20 +3,23 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-def get_all_pages(url, liste=[]):
+def get_all_pages(url, df=pd.DataFrame()):
     '''return database items'''
     response_ = requests.get(url)
     response_ = response_.json()
-    liste.append(response_['items'])
-    if response_['hasMore'] != True:
-        return liste
+
+   #append list of dicts to dataframe
+    dfNew = pd.DataFrame(response_['items'])
+    df = df.append(dfNew,ignore_index=True)
+
+    if not response_['hasMore']:
+        return df
     else:
-        liste.append(response_['items'])
         for elem in response_['links']:
             for k, v in elem.items():
                 if v == 'next':
                     new_url = elem['href']
-        return get_all_pages(new_url, liste)
+        return get_all_pages(new_url, df)
 
 def to_data_frame(url_result):
     output = pd.DataFrame()

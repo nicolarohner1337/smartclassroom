@@ -17,8 +17,8 @@ class noConnection:
 
 uart_connections = {
     'CIRCUITPY323d': {'connection':noConnection,'values':3,'units':['PPM','C','%'],'timeoutDuration':0,'notTimeout':True,'timeoutStart':time.time(),'lastValues':[]},
-    'CIRCUITPY825a': {'connection':noConnection,'values':1, 'units':['Window'],'timeoutDuration':0,'notTimeout':True,'timeoutStart':time.time(),'lastValues':[]}
-    #'CIRCUITPYbec9': {'connection':noConnection,'values':1, 'units':['Person'],'timeoutDuration':0,'notTimeout':True,'timeoutStart':time.time(),'lastValues':[]}
+    'CIRCUITPY825a': {'connection':noConnection,'values':1, 'units':['Window'],'timeoutDuration':0,'notTimeout':True,'timeoutStart':time.time(),'lastValues':[]},
+    'CIRCUITPYbec9': {'connection':noConnection,'values':1, 'units':['Person'],'timeoutDuration':0,'notTimeout':True,'timeoutStart':time.time(),'lastValues':[]}
 }
 urlApi = 'https://glusfqycvwrucp9-db202202211424.adb.eu-zurich-1.oraclecloudapps.com/ords/sensor_datalake1/sens/insert/'
 headers = {"key":"Content-Type","value":"application/json","description":""}
