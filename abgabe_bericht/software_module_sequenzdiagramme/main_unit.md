@@ -1,5 +1,4 @@
-# nic: only while connected raspi receives data
-# if not it try to reconnect
+
 ```mermaid
 sequenceDiagram
     participant raspberry_pi
