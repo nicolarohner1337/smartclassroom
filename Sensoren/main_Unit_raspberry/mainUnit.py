@@ -6,8 +6,6 @@ from colorama import Fore
 from adafruit_ble import BLERadio
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.nordic import UARTService
-#from influxdb_client import InfluxDBClient, Point, WritePrecision
-#from influxdb_client.client.write_api import SYNCHRONOUS
 
 ble = BLERadio()
 
@@ -30,10 +28,8 @@ bucket = "smartclassroom"
 
 notTimeout = True
 setTimeout = time.time()
-#delete because move this to the connections dictionary
 timeoutDurationSteps = [60,120,240,480,600,1200,1800]
-#debugSteps
-#timeoutDurationSteps = [100000]
+
 def connection(uart_connection,complete_name):
     while not uart_connection:
         print(Fore.YELLOW + "Trying to connect...{}".format(complete_name))
@@ -56,15 +52,9 @@ def connection(uart_connection,complete_name):
         uart_service = uart_connection[UARTService]
         return uart_service, uart_connection
     else:
-        #is this really needed?
-        #uart_connections[complete_name]['inRange'] = False
         NoUart_connections = noConnection
         print(Fore.RED + "Failed to connect with {}".format(complete_name))
         return None, NoUart_connections
-#check if connection is true
-#for k,v in uart_connections.items():
-    #uart_connections[k]['service'],uart_connections[k]['connection'] = connection(v['connection'],k)
-
 
 while True:
     #initialize all connections
@@ -76,45 +66,23 @@ while True:
             pass
    
     while any([uart_connections[k]['connection'].connected for k,v in uart_connections.items()]):
-        #TODO try read not readline
         if time.time() - lastApiCall > 5:
             for k,v in uart_connections.items():
-                #if not all([uart_connections[k]['connection'].connected for k,v in uart_connections.items()]) and time.time() - startSending > 60:
-                    #break
                 try:
                     #only read if there is connection
-                    #TODO zahlen mehr lesenn und wenn sie nicht lehr ist an api schicken
                     if uart_connections[k]['connection'].connected:
                         #if lastValues is empty, read all
                         tempList = uart_connections[k]['service'].readline()
                         tempList = tempList.decode('utf-8').strip('\n').split(',')
-                        #if len(uart_connections[k]['lastValues']) == 0:
-                            #uart_connections[k]['lastValues'] = tempList
-                            
+                        #if values have same length than expected send to api
                         if uart_connections[k]['values'] == len(tempList):
-                            # for list  with lenght > 2 call multiple post requests
-                            #if lastValues  equal to tempList, do not send
-
-                            #if any([uart_connections[k]['lastValues'][i] != tempList[i] for i in range(len(tempList))]):
-                                #uart_connections[k]['lastValues'] = tempList
-                                
                                 for i in range(len(tempList)):
                                     if str(tempList[i]) != "":
                                         json = {'sensor_id':k,'value1':tempList[i],'unit1':uart_connections[k]['units'][i]}
                                         #send request
                                         response = requests.post(urlApi,headers = headers,data=json)
-                                    
-                                        #print response
-                                        #print(Fore.GREEN + "Sended {} Code:{}".format(json,response.status_code))
-                                        #with InfluxDBClient(url="https://eu-central-1-1.aws.cloud2.influxdata.com", token=token, org=org) as client:
-                                            #write_api = client.write_api(write_options=SYNCHRONOUS)
-                                            #data = "APICALLS,unit={} increment=1".format(json["unit1"])
-                                            #write_api.write(bucket, org, data) 
                                         lastApiCall = time.time()
-                                        time.sleep(0.5)
-                            #json['timestamp'] = time.time()
-                            #send to server
-                            
+                                        time.sleep(0.5)        
                     time.sleep(1)
                 except KeyboardInterrupt:
                     print ('KeyboardInterrupt exception is caught')
@@ -126,7 +94,6 @@ while True:
                 uart_connections[k]['tryReconnect'] = True
     
         while any([uart_connections[k]['tryReconnect'] for k,v in uart_connections.items()]) and not all([uart_connections[k]['connection'].connected for k,v in uart_connections.items()]):
-            #BUG infinity loop in case of no connection
             for k,v in uart_connections.items():
                 if not uart_connections[k]['connection'].connected and uart_connections[k]['tryReconnect']:
                     print(Fore.RED + "We found a disconnected device {}".format(k))

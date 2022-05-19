@@ -9,10 +9,6 @@ from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.nordic import UARTService
 import tm1637
 
-
-
-
- # nRF5840 D5, Grove D2
 count_up = digitalio.DigitalInOut(board.D9)
 count_down = digitalio.DigitalInOut(board.D5)
 CLK = board.SCL
@@ -20,8 +16,6 @@ DIO = board.SDA
 display = tm1637.TM1637(CLK, DIO)
 #display.hex(0x1230)
 time.sleep(5)
-
-
 
 led = neopixel.NeoPixel(board.NEOPIXEL, 1)
 led.brightness = 0.3
