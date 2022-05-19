@@ -31,3 +31,11 @@ sequenceDiagram
     raspberry_pi->>adafruit_ppm_c_%: ...
 
 ```
+```mermaid
+flowchart ID
+A[Try to connect] --> B{Connected?};
+B -- Yes --> C[Send data to database];
+B -- No --> D[Break for t sec];
+D --> B;
+```
+```
