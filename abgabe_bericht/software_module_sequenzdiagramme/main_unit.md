@@ -32,7 +32,7 @@ sequenceDiagram
 
 ```
 ```mermaid
-flowchart ID
+flowchart TD
 A[Try to connect] --> B{Connected?};
 B -- Yes --> C[Send data to database];
 B -- No --> D[Break for t sec];
