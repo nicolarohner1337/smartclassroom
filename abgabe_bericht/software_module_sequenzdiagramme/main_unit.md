@@ -24,11 +24,12 @@ sequenceDiagram
     participant adafruit_window
     participant adafruit_people
     participant data_base
-    raspberry_pi->>adafruit_ppm_c_%: connect
-    adafruit_ppm_c_%->>raspberry_pi: connection failed
-    raspberry_pi->>adafruit_ppm_c_%: reconnect
-    adafruit_ppm_c_%->>raspberry_pi: connection failed
-    raspberry_pi->>adafruit_ppm_c_%: ...
+    raspberry_pi->>adafruit_ppm_c_%: connect (10 sec)
+    raspberry_pi->>adafruit_ppm_c_%: reconnect (after t sec)
+    raspberry_pi->>adafruit_window: connect (10 sec)
+    adafruit_window->>raspberry_pi: connection established
+    adafruit_window->>raspberry_pi: sends data via bluetooth
+    raspberry_pi->>data_base: sends data via http POST
 
 ```
 ```mermaid
