@@ -25,10 +25,10 @@ sequenceDiagram
     participant adafruit_people
     participant data_base
     raspberry_pi->>adafruit_ppm_c_%: connect (10 sec)
-    raspberry_pi->>adafruit_ppm_c_%: reconnect (after t sec)
     raspberry_pi->>adafruit_window: connect (10 sec)
-    adafruit_window->>raspberry_pi: connection established
-    adafruit_window->>raspberry_pi: sends data via bluetooth
+    raspberry_pi->>adafruit_people: connect (10 sec)
+    adafruit_people->>raspberry_pi: connection established
+    adafruit_people->>raspberry_pi: sends data via bluetooth
     raspberry_pi->>data_base: sends data via http POST
 
 ```
