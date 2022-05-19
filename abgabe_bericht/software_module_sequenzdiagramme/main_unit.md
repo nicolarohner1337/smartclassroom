@@ -29,7 +29,7 @@ sequenceDiagram
     raspberry_pi->>adafruit_people: connect (10 sec)
     adafruit_people->>raspberry_pi: connection established
     adafruit_people->>raspberry_pi: sends data via bluetooth
-    raspberry_pi->>data_base: sends data via http POST
+    raspberry_pi->>data_base: sends data via https POST
 
 ```
 ```mermaid
