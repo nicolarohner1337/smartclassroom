@@ -28,8 +28,9 @@ def to_data_frame(url_result):
             output = output.append(dicti, ignore_index=True)
     return output
 
-def overview(df, col):
-    f, axs = plt.subplots(1,2, figsize=(9,6), gridspec_kw=dict(width_ratios=[15,10]))
+def overview(df, col, x_label):
+    f, axs = plt.subplots(1,2, figsize=(20,6), gridspec_kw=dict(width_ratios=[15,10]))
     sns.boxplot(df[col], ax=axs[0])
     sns.distplot(df[col], ax=axs[1])
+    plt.xlabel(x_label)
     return plt.show()
