@@ -18,5 +18,5 @@
 - Bericht.pdf [Bericht 10 Seiten]
 ## Video
 https://www.youtube.com/embed/4V-ooGQGic4
-## Daten
+## Daten - CSV
 https://fhnw365.sharepoint.com/:x:/t/2Da_M365/ETzbzHz7rqNJkzzKeRmBQ4sBbADgdFYlzvbhe3NHLLqqSg?e=fyMKga
