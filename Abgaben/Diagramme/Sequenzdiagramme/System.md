@@ -1,4 +1,4 @@
-
+# Main Unit
 ```mermaid
 sequenceDiagram
     participant raspberry_pi
@@ -17,6 +17,7 @@ sequenceDiagram
     adafruit_people->>raspberry_pi: sends data via bluetooth
     raspberry_pi->>data_base: sends data via http POST
 ```
+# Main Unit Reconnection
 ```mermaid
 sequenceDiagram
     participant raspberry_pi
@@ -32,6 +33,7 @@ sequenceDiagram
     raspberry_pi->>data_base: sends data via https POST
 
 ```
+#Main Unit Reconnection Failed Loop
 ```mermaid
 flowchart TD
 A[Try to connect] --> B{Connected?};
