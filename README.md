@@ -1,12 +1,13 @@
 # Smartclassroom Challenge
 ## Inhalt
 - Abgabe
+  - Bericht 
   - DB-Script [Rest Definition etv.]
   -  Diagramme 
-    - Konzeptionelles_Model
-    - ERD [Entity Relationship Diagram]
-    - Sequenzdiagramme [Diagramme für mainUnit.py]
-    - Systemarchtiektur [Diagramme System]
+      - Konzeptionelles_Model
+      - ERD [Entity Relationship Diagram]
+      - Sequenzdiagramme [Diagramme für mainUnit.py]
+      - Systemarchtiektur [Diagramme System]
   - Verkabelung [Verkabelung pro Mikrokontroller]
 - Analyse [Jupyter Notebook]
 - Sensoren [Source Code]
