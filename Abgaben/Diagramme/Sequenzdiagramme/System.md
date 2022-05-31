@@ -33,7 +33,7 @@ sequenceDiagram
     raspberry_pi->>data_base: sends data via https POST
 
 ```
-#Main Unit Reconnection Failed Loop
+# Main Unit Reconnection Failed Loop
 ```mermaid
 flowchart TD
 A[Try to connect] --> B{Connected?};
